@@ -623,7 +623,14 @@ class PyVariable(PyObject):
 
         typ = self.options.get('type')
         if typ:
-            signode += addnodes.desc_annotation(typ, '', nodes.Text(': '), type_to_xref(typ))
+            try:
+                children = _parse_annotation(typ)
+            except SyntaxError:
+                signode += addnodes.desc_sig_punctuation('', ':')
+                signode += nodes.Text(' ')
+                signode += addnodes.desc_sig_name('', '', *children)  # type: ignore
+            else:
+                signode += addnodes.desc_annotation(typ, '', nodes.Text(': '), type_to_xref(typ))
 
         value = self.options.get('value')
         if value:
@@ -868,7 +875,14 @@ class PyAttribute(PyObject):
 
         typ = self.options.get('type')
         if typ:
-            signode += addnodes.desc_annotation(typ, '', nodes.Text(': '), type_to_xref(typ))
+            try:
+                children = _parse_annotation(typ)
+            except SyntaxError:
+                signode += addnodes.desc_sig_punctuation('', ':')
+                signode += nodes.Text(' ')
+                signode += addnodes.desc_sig_name('', '', *children)  # type: ignore
+            else:
+                signode += addnodes.desc_annotation(typ, '', nodes.Text(': '), type_to_xref(typ))
 
         value = self.options.get('value')
         if value:
