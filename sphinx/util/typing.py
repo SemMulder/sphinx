@@ -66,7 +66,10 @@ def _stringify_py37(annotation: Any) -> str:
     module = getattr(annotation, '__module__', None)
     if module == 'typing':
         if getattr(annotation, '_name', None):
-            qualname = '%s.%s' % (module, annotation._name)
+            if annotation._name == 'AbstractContextManager':
+                qualname = '%s.%s' % (module, 'ContextManager')
+            else:
+                qualname = '%s.%s' % (module, annotation._name)
         elif getattr(annotation, '__qualname__', None):
             if annotation.__qualname__.startswith('NewType'):
                 qualname = "%s.NewType('%s', %s)" % (
@@ -116,7 +119,10 @@ def _stringify_py36(annotation: Any) -> str:
     module = getattr(annotation, '__module__', None)
     if module == 'typing':
         if getattr(annotation, '_name', None):
-            qualname = '%s.%s' % (module, annotation._name)
+            if annotation._name == 'AbstractContextManager':
+                qualname = '%s.%s' % (module, 'ContextManager')
+            else:
+                qualname = '%s.%s' % (module, annotation._name)
         elif getattr(annotation, '__qualname__', None):
             if annotation.__qualname__.startswith('NewType'):
                 qualname = "%s.NewType('%s', %s)" % (
