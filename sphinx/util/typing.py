@@ -66,11 +66,11 @@ def _stringify_py37(annotation: Any) -> str:
     module = getattr(annotation, '__module__', None)
     if module == 'typing':
         if getattr(annotation, '_name', None):
-            qualname = annotation._name
+            qualname = '%s.%s' % (module, annotation._name)
         elif getattr(annotation, '__qualname__', None):
-            qualname = annotation.__qualname__
+            qualname = '%s.%s' % (module, annotation.__qualname__)
         elif getattr(annotation, '__forward_arg__', None):
-            qualname = annotation.__forward_arg__
+            qualname = '%s.%s' % (module, annotation.__forward_arg__)
         else:
             qualname = stringify(annotation.__origin__)  # ex. Union
     elif hasattr(annotation, '__qualname__'):
@@ -84,13 +84,13 @@ def _stringify_py37(annotation: Any) -> str:
         return repr(annotation)
 
     if getattr(annotation, '__args__', None):
-        if qualname == 'Union':
+        if qualname == 'typing.Union':
             if len(annotation.__args__) == 2 and annotation.__args__[1] is NoneType:  # type: ignore  # NOQA
-                return 'Optional[%s]' % stringify(annotation.__args__[0])
+                return 'typing.Optional[%s]' % stringify(annotation.__args__[0])
             else:
                 args = ', '.join(stringify(a) for a in annotation.__args__)
                 return '%s[%s]' % (qualname, args)
-        elif qualname == 'Callable':
+        elif qualname == 'typing.Callable':
             args = ', '.join(stringify(a) for a in annotation.__args__[:-1])
             returns = stringify(annotation.__args__[-1])
             return '%s[[%s], %s]' % (qualname, args, returns)
@@ -110,15 +110,15 @@ def _stringify_py36(annotation: Any) -> str:
     module = getattr(annotation, '__module__', None)
     if module == 'typing':
         if getattr(annotation, '_name', None):
-            qualname = annotation._name
+            qualname = '%s.%s' % (module, annotation._name)
         elif getattr(annotation, '__qualname__', None):
-            qualname = annotation.__qualname__
+            qualname = '%s.%s' % (module, annotation.__qualname__)
         elif getattr(annotation, '__forward_arg__', None):
-            qualname = annotation.__forward_arg__
+            qualname = '%s.%s' % (module, annotation.__forward_arg__)
         elif getattr(annotation, '__origin__', None):
             qualname = stringify(annotation.__origin__)  # ex. Union
         else:
-            qualname = repr(annotation).replace('typing.', '')
+            qualname = repr(annotation)
     elif hasattr(annotation, '__qualname__'):
         qualname = '%s.%s' % (module, annotation.__qualname__)
     else:
@@ -155,7 +155,7 @@ def _stringify_py36(annotation: Any) -> str:
         params = annotation.__union_params__
         if params is not None:
             if len(params) == 2 and params[1] is NoneType:  # type: ignore
-                return 'Optional[%s]' % stringify(params[0])
+                return 'typing.Optional[%s]' % stringify(params[0])
             else:
                 param_str = ', '.join(stringify(p) for p in params)
                 return '%s[%s]' % (qualname, param_str)
@@ -164,10 +164,10 @@ def _stringify_py36(annotation: Any) -> str:
         params = annotation.__args__
         if params is not None:
             if len(params) == 2 and params[1] is NoneType:  # type: ignore
-                return 'Optional[%s]' % stringify(params[0])
+                return 'typing.Optional[%s]' % stringify(params[0])
             else:
                 param_str = ', '.join(stringify(p) for p in params)
-                return 'Union[%s]' % param_str
+                return 'typing.Union[%s]' % param_str
     elif (isinstance(annotation, typing.CallableMeta) and  # type: ignore
           getattr(annotation, '__args__', None) is not None and
           hasattr(annotation, '__result__')):  # for Python 3.5
