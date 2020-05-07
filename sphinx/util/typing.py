@@ -68,7 +68,13 @@ def _stringify_py37(annotation: Any) -> str:
         if getattr(annotation, '_name', None):
             qualname = '%s.%s' % (module, annotation._name)
         elif getattr(annotation, '__qualname__', None):
-            qualname = '%s.%s' % (module, annotation.__qualname__)
+            if annotation.__qualname__.startswith('NewType'):
+                qualname = "%s.NewType('%s', %s)" % (
+                    module, annotation.__name__,
+                    stringify(annotation.__supertype__),
+                )
+            else:
+                qualname = '%s.%s' % (module, annotation.__qualname__)
         elif getattr(annotation, '__forward_arg__', None):
             qualname = '%s.%s' % (module, annotation.__forward_arg__)
         else:
@@ -112,7 +118,13 @@ def _stringify_py36(annotation: Any) -> str:
         if getattr(annotation, '_name', None):
             qualname = '%s.%s' % (module, annotation._name)
         elif getattr(annotation, '__qualname__', None):
-            qualname = '%s.%s' % (module, annotation.__qualname__)
+            if annotation.__qualname__.startswith('NewType'):
+                qualname = "%s.NewType('%s', %s)" % (
+                    module, annotation.__name__,
+                    stringify(annotation.__supertype__),
+                )
+            else:
+                qualname = '%s.%s' % (module, annotation.__qualname__)
         elif getattr(annotation, '__forward_arg__', None):
             qualname = '%s.%s' % (module, annotation.__forward_arg__)
         elif getattr(annotation, '__origin__', None):
