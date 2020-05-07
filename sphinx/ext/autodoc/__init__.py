@@ -1687,7 +1687,18 @@ class InstanceAttributeDocumenter(AttributeDocumenter):
         self.objtype = 'attribute'
         self.object = INSTANCEATTR
         self._datadescriptor = False
-        return True
+
+        with mock(self.env.config.autodoc_mock_imports):
+            try:
+                ret = import_object(self.modname, self.objpath[:-1], 'class',
+                                    attrgetter=self.get_attr,
+                                    warningiserror=self.env.config.autodoc_warningiserror)
+                self.module, _, _, self.parent = ret
+                return True
+            except ImportError as exc:
+                logger.warning(exc.args[0], type='autodoc', subtype='import_object')
+                self.env.note_reread()
+                return False
 
     def add_content(self, more_content: Any, no_docstring: bool = False) -> None:
         """Never try to get a docstring from the object."""
